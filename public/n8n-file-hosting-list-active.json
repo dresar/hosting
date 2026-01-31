@@ -1,0 +1,59 @@
+{
+  "name": "File Hosting - List File Aktif",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "Start",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.FILE_HOSTING_BASE_URL}}/api/files?status=active",
+        "method": "GET",
+        "sendBinaryData": false,
+        "options": {},
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "x-api-key",
+              "value": "={{$env.FILE_HOSTING_API_KEY}}"
+            }
+          ]
+        }
+      },
+      "id": "ListActiveFiles",
+      "name": "List Active Files",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "List Active Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "active": false,
+  "versionId": "file-hosting-list-active-template",
+  "id": "file-hosting-list-active-template",
+  "tags": []
+}
+
