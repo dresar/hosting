@@ -1,0 +1,73 @@
+{
+  "name": "File Hosting - Upload via API",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "Start",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.FILE_HOSTING_BASE_URL}}/api/files",
+        "method": "POST",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "sendBody": true,
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "x-api-key",
+              "value": "={{$env.FILE_HOSTING_API_KEY}}"
+            }
+          ]
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "expiry_minutes",
+              "value": "60"
+            },
+            {
+              "name": "meta",
+              "value": "={{JSON.stringify({ source: \"n8n\", note: \"upload via template\" })}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "UploadFile",
+      "name": "Upload File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Upload File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "active": false,
+  "versionId": "file-hosting-upload-template",
+  "id": "file-hosting-upload-template",
+  "tags": []
+}
+

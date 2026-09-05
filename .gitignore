@@ -1,0 +1,4 @@
+# Security rules added by Antigravity Sanitizer
+.env
+.env.*
+!.env.example

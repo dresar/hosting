@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Temporary File Hosting API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/tw.css" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div class="min-h-screen flex flex-col">
+      <header class="border-b border-slate-200 bg-white/80 backdrop-blur dark:bg-slate-900/80 dark:border-slate-800">
+        <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white text-sm font-semibold">FH</span>
+              <div>
+                <h1 class="text-base sm:text-lg font-semibold tracking-tight">Temporary File Hosting API</h1>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  Sederhana, publik, tanpa login. Domain target: <span class="font-mono text-xs">https://apprentice.cyou/</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button
+              id="theme-toggle"
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            >
+              <span id="theme-icon" class="text-base">🌙</span>
+              <span id="theme-label">Dark</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1">
+        <div class="mx-auto max-w-6xl px-4 py-6 lg:py-10">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
+            <section class="space-y-6">
+              <div class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                <h2 class="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50 mb-1">
+                  Upload File
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                  Upload file publik (video dan jenis lain). Link akan dihasilkan otomatis dan bisa dipakai di mana saja.
+                </p>
+
+                <form id="upload-form" class="space-y-4">
+                  <div class="grid gap-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+                    <div class="space-y-2">
+                      <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">
+                        Pilih file
+                      </label>
+                      <input
+                        id="file-input"
+                        type="file"
+                        name="file"
+                        class="block w-full text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-blue-700 cursor-pointer rounded-lg border border-dashed border-slate-300 bg-slate-50/80 px-3 py-2 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                      <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                        Disarankan video (.mp4, .mov, .avi). Maksimal 100MB per file.
+                      </p>
+                    </div>
+                    <div class="space-y-2">
+                      <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">
+                        Folder (opsional)
+                      </label>
+                      <input
+                        id="folder-input"
+                        type="text"
+                        placeholder="contoh: campaign-ig, client-a"
+                        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                      <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                        Hanya untuk organisasi lokal di browser ini. Semua file tetap publik via URL.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-3">
+                    <button
+                      id="upload-button"
+                      type="submit"
+                      class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:focus-visible:ring-offset-slate-900"
+                    >
+                      <span id="upload-spinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+                      <span id="upload-text">Upload</span>
+                    </button>
+                    <p id="upload-status" class="text-[11px] text-slate-500 dark:text-slate-400"></p>
+                  </div>
+                </form>
+
+                <div class="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/80 p-3 text-[11px] text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300">
+                  <div class="flex items-start gap-2">
+                    <span class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800 text-[9px] font-semibold text-white dark:bg-slate-200 dark:text-slate-900">i</span>
+                    <div>
+                      <p class="font-medium mb-1">Catatan hosting</p>
+                      <p>
+                        Setelah di-deploy ke cPanel dan diarahkan ke domain
+                        <span class="font-mono text-[10px]">https://apprentice.cyou/</span>,
+                        halaman ini dapat diakses langsung dari root domain.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.1fr)]">
+                <div class="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                  <div class="flex items-center justify-between gap-2 mb-3">
+                    <h2 class="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      Folder
+                    </h2>
+                    <form id="new-folder-form" class="flex items-center gap-2 text-[11px]">
+                      <input
+                        id="new-folder-input"
+                        type="text"
+                        placeholder="Nama folder baru"
+                        class="w-24 sm:w-32 rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                      <button
+                        type="submit"
+                        class="inline-flex items-center rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                      >
+                        Tambah
+                      </button>
+                    </form>
+                  </div>
+                  <div
+                    id="folder-list"
+                    class="flex flex-wrap gap-2 text-[11px]"
+                  ></div>
+                </div>
+
+                <div class="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                  <div class="flex items-center justify-between gap-2 mb-3">
+                    <h2 class="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      File di Folder Aktif
+                    </h2>
+                    <p id="active-folder-label" class="text-[11px] text-slate-500 dark:text-slate-400"></p>
+                  </div>
+                  <div id="file-list" class="space-y-3 max-h-[360px] overflow-y-auto pr-1 text-[11px]"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="space-y-4">
+              <div class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                <h2 class="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50 mb-1">
+                  API Overview
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                  Form upload ini publik tanpa autentikasi. Untuk integrasi otomatis (n8n) tersedia endpoint khusus dengan API key.
+                </p>
+
+                <div class="space-y-3 text-[11px]">
+                  <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                    <div class="mb-2 flex items-center gap-2">
+                      <span class="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        GET
+                      </span>
+                      <code class="font-mono text-xs text-slate-800 dark:text-slate-100">
+                        /health
+                      </code>
+                    </div>
+                    <p class="mb-2 text-slate-600 dark:text-slate-300">
+                      Cek status server.
+                    </p>
+                    <pre class="overflow-x-auto rounded-lg bg-slate-900 px-3 py-2 text-[10px] text-slate-100 dark:bg-black"><code>curl -X GET "{{ORIGIN}}/health"</code></pre>
+                  </div>
+
+                  <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                    <div class="mb-2 flex items-center gap-2">
+                      <span class="inline-flex rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:text-blue-300">
+                        POST
+                      </span>
+                      <span class="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        PUBLIC
+                      </span>
+                      <code class="font-mono text-xs text-slate-800 dark:text-slate-100">
+                        /upload
+                      </code>
+                    </div>
+                    <p class="mb-2 text-slate-600 dark:text-slate-300">
+                      Upload file via multipart form. Server akan mengembalikan URL publik.
+                    </p>
+                    <pre class="overflow-x-auto rounded-lg bg-slate-900 px-3 py-2 text-[10px] text-slate-100 dark:bg-black"><code>curl -X POST "{{ORIGIN}}/upload" \
+  -F "file=@/path/to/video.mp4"</code></pre>
+                    <p class="mt-2 mb-1 text-slate-600 dark:text-slate-300">
+                      Contoh respons:
+                    </p>
+                    <pre class="overflow-x-auto rounded-lg bg-slate-900 px-3 py-2 text-[10px] text-slate-100 dark:bg-black"><code>{
+  "success": true,
+  "url": "{{ORIGIN}}/files/xxxxx.mp4",
+  "filename": "xxxxx.mp4",
+  "size": 123456
+}</code></pre>
+                  </div>
+
+                  <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                    <div class="mb-2 flex items-center gap-2">
+                      <span class="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        GET
+                      </span>
+                      <span class="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        PUBLIC
+                      </span>
+                      <code class="font-mono text-xs text-slate-800 dark:text-slate-100">
+                        /files/:filename
+                      </code>
+                    </div>
+                    <p class="mb-2 text-slate-600 dark:text-slate-300">
+                      Akses file yang sudah di-upload. Mendukung header Range untuk video streaming.
+                    </p>
+                    <pre class="overflow-x-auto rounded-lg bg-slate-900 px-3 py-2 text-[10px] text-slate-100 dark:bg-black"><code>curl -L "{{ORIGIN}}/files/xxxxx.mp4" -o output.mp4</code></pre>
+                  </div>
+
+                  <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                    <h3 class="text-[11px] font-semibold mb-1 text-slate-800 dark:text-slate-100">
+                      Maintenance singkat
+                    </h3>
+                    <ul class="list-disc space-y-1 pl-4 text-[11px] text-slate-600 dark:text-slate-300">
+                      <li>Monitor disk space di server karena file video cukup besar.</li>
+                      <li>Pastikan cron/interval Node.js tetap aktif agar auto cleanup 3 jam berjalan.</li>
+                      <li>Jika aplikasi error, lakukan restart Node.js App dari panel cPanel.</li>
+                      <li>Update dependency Node.js secara berkala dan test di staging sebelum production.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                <h2 class="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50 mb-1">
+                  Integrasi n8n
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                  Gunakan endpoint API yang sama langsung dari workflow n8n. Endpoint ini menggunakan header
+                  <span class="font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded dark:bg-slate-800">x-api-key</span>
+                  untuk autentikasi.
+                </p>
+
+                <div class="space-y-3 text-[11px]">
+                  <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                    <h3 class="text-[11px] font-semibold mb-1 text-slate-800 dark:text-slate-100">
+                      Langkah singkat di n8n
+                    </h3>
+                    <ol class="list-decimal space-y-1 pl-4 text-[11px] text-slate-600 dark:text-slate-300">
+                      <li>Pastikan server ini bisa diakses dari n8n (contoh: <span class="font-mono text-[10px">{{ORIGIN}}</span>).</li>
+                      <li>Buat environment variable di n8n:
+                        <span class="font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded dark:bg-slate-800">$env.FILE_HOSTING_BASE_URL</span>
+                        dan
+                        <span class="font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded dark:bg-slate-800">$env.FILE_HOSTING_API_KEY</span>.
+                      </li>
+                      <li>Import salah satu template JSON di bawah ini ke n8n, lalu sesuaikan jika perlu.</li>
+                    </ol>
+                  </div>
+
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                      <p class="mb-1 font-semibold text-slate-800 dark:text-slate-100">
+                        Template 1: Upload file
+                      </p>
+                      <p class="mb-2 text-slate-600 dark:text-slate-300">
+                        Workflow sederhana: Start → HTTP Request (POST /api/files) dengan binary dari node sebelumnya.
+                      </p>
+                      <a
+                        href="/n8n-file-hosting-upload.json"
+                        download
+                        class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700"
+                      >
+                        Download template upload.json
+                      </a>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                      <p class="mb-1 font-semibold text-slate-800 dark:text-slate-100">
+                        Template 2: List file aktif
+                      </p>
+                      <p class="mb-2 text-slate-600 dark:text-slate-300">
+                        Workflow sederhana: Start → HTTP Request (GET /api/files?status=active) untuk membaca daftar file yang belum expired.
+                      </p>
+                      <a
+                        href="/n8n-file-hosting-list-active.json"
+                        download
+                        class="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                      >
+                        Download template list-active.json
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/70">
+                    <h3 class="text-[11px] font-semibold mb-1 text-slate-800 dark:text-slate-100">
+                      Contoh konfigurasi node HTTP Request (upload)
+                    </h3>
+                    <pre class="overflow-x-auto rounded-lg bg-slate-900 px-3 py-2 text-[10px] text-slate-100 dark:bg-black"><code>{
+  "url": "={{$env.FILE_HOSTING_BASE_URL}}/api/files",
+  "method": "POST",
+  "sendBinaryData": true,
+  "binaryPropertyName": "data",
+  "sendBody": true,
+  "headerParametersUi": {
+    "parameter": [
+      {
+        "name": "x-api-key",
+        "value": "={{$env.FILE_HOSTING_API_KEY}}"
+      }
+    ]
+  },
+  "bodyParametersUi": {
+    "parameter": [
+      { "name": "expiry_minutes", "value": "60" },
+      { "name": "meta", "value": "={{JSON.stringify({ source: \"n8n\" })}}" }
+    ]
+  }
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <footer class="border-t border-slate-200 bg-white/80 py-3 text-center text-[11px] text-slate-500 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-400">
+        <div class="mx-auto max-w-6xl px-4 flex flex-col sm:flex-row items-center justify-between gap-1">
+          <p>
+            Temporary File Hosting API • Auto delete ±3 jam • Public by default
+          </p>
+          <p>
+            Made by <span class="font-semibold">Eka Syarif Maulana</span>
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      const origin = window.location.origin;
+
+      document.querySelectorAll("pre code").forEach(function (el) {
+        el.textContent = el.textContent.replace(/{{ORIGIN}}/g, origin);
+      });
+
+      const THEME_STORAGE_KEY = "fh_theme";
+      const FOLDERS_STORAGE_KEY = "fh_folders";
+      const FILES_STORAGE_KEY = "fh_files";
+
+      const themeButton = document.getElementById("theme-toggle");
+      const themeIcon = document.getElementById("theme-icon");
+      const themeLabel = document.getElementById("theme-label");
+
+      const uploadForm = document.getElementById("upload-form");
+      const fileInput = document.getElementById("file-input");
+      const folderInput = document.getElementById("folder-input");
+      const uploadButton = document.getElementById("upload-button");
+      const uploadSpinner = document.getElementById("upload-spinner");
+      const uploadText = document.getElementById("upload-text");
+      const uploadStatus = document.getElementById("upload-status");
+
+      const newFolderForm = document.getElementById("new-folder-form");
+      const newFolderInput = document.getElementById("new-folder-input");
+      const folderListEl = document.getElementById("folder-list");
+      const fileListEl = document.getElementById("file-list");
+      const activeFolderLabel = document.getElementById("active-folder-label");
+
+      let folders = [];
+      let files = [];
+      let activeFolderId = null;
+
+      function initTheme() {
+        const saved = localStorage.getItem(THEME_STORAGE_KEY);
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const useDark = saved ? saved === "dark" : prefersDark;
+        if (useDark) {
+          document.documentElement.classList.add("dark");
+          themeIcon.textContent = "☀️";
+          themeLabel.textContent = "Light";
+        } else {
+          document.documentElement.classList.remove("dark");
+          themeIcon.textContent = "🌙";
+          themeLabel.textContent = "Dark";
+        }
+      }
+
+      themeButton.addEventListener("click", function () {
+        const isDark = document.documentElement.classList.toggle("dark");
+        if (isDark) {
+          localStorage.setItem(THEME_STORAGE_KEY, "dark");
+          themeIcon.textContent = "☀️";
+          themeLabel.textContent = "Light";
+        } else {
+          localStorage.setItem(THEME_STORAGE_KEY, "light");
+          themeIcon.textContent = "🌙";
+          themeLabel.textContent = "Dark";
+        }
+      });
+
+      function loadState() {
+        try {
+          const storedFolders = JSON.parse(localStorage.getItem(FOLDERS_STORAGE_KEY) || "[]");
+          const storedFiles = JSON.parse(localStorage.getItem(FILES_STORAGE_KEY) || "[]");
+          folders = Array.isArray(storedFolders) && storedFolders.length > 0 ? storedFolders : [
+            { id: "default", name: "Default" }
+          ];
+          files = Array.isArray(storedFiles) ? storedFiles : [];
+          activeFolderId = folders[0].id;
+        } catch (e) {
+          folders = [{ id: "default", name: "Default" }];
+          files = [];
+          activeFolderId = "default";
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(FOLDERS_STORAGE_KEY, JSON.stringify(folders));
+        localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(files));
+      }
+
+      function setActiveFolder(id) {
+        activeFolderId = id;
+        renderFolders();
+        renderFiles();
+      }
+
+      function renderFolders() {
+        folderListEl.innerHTML = "";
+        folders.forEach((folder) => {
+          const btn = document.createElement("button");
+          const isActive = folder.id === activeFolderId;
+          btn.type = "button";
+          btn.textContent = folder.name;
+          btn.className =
+            "inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] border transition " +
+            (isActive
+              ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+              : "border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800");
+          btn.addEventListener("click", function () {
+            setActiveFolder(folder.id);
+          });
+          folderListEl.appendChild(btn);
+        });
+        const active = folders.find((f) => f.id === activeFolderId);
+        activeFolderLabel.textContent = active ? "Folder: " + active.name : "";
+      }
+
+      function fileTypeFromName(name) {
+        const lower = name.toLowerCase();
+        if (lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.endsWith(".avi")) {
+          return "video";
+        }
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".gif") || lower.endsWith(".webp")) {
+          return "image";
+        }
+        if (lower.endsWith(".pdf")) {
+          return "pdf";
+        }
+        return "other";
+      }
+
+      function renderFiles() {
+        fileListEl.innerHTML = "";
+        const list = files.filter((f) => f.folderId === activeFolderId);
+        if (list.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "text-[11px] text-slate-500 dark:text-slate-400";
+          empty.textContent = "Belum ada file di folder ini.";
+          fileListEl.appendChild(empty);
+          return;
+        }
+        list
+          .slice()
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .forEach((file) => {
+            const wrapper = document.createElement("div");
+            wrapper.className =
+              "rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-[11px] dark:border-slate-700 dark:bg-slate-900/70";
+
+            const header = document.createElement("div");
+            header.className = "mb-2 flex items-start justify-between gap-2";
+            const title = document.createElement("div");
+            title.className = "min-w-0";
+
+            const nameEl = document.createElement("p");
+            nameEl.className = "truncate font-medium text-slate-800 dark:text-slate-50";
+            nameEl.textContent = file.filename;
+            const metaEl = document.createElement("p");
+            metaEl.className = "text-[10px] text-slate-500 dark:text-slate-400";
+            const sizeKb = file.size ? (file.size / 1024).toFixed(1) + " KB" : "";
+            const date = new Date(file.createdAt).toLocaleString();
+            metaEl.textContent = [file.type.toUpperCase(), sizeKb, date].filter(Boolean).join(" • ");
+
+            title.appendChild(nameEl);
+            title.appendChild(metaEl);
+
+            const actions = document.createElement("div");
+            actions.className = "flex flex-shrink-0 items-center gap-2";
+
+            const openLink = document.createElement("a");
+            openLink.href = file.url;
+            openLink.target = "_blank";
+            openLink.rel = "noopener noreferrer";
+            openLink.className =
+              "inline-flex items-center rounded-lg border border-slate-300 px-2 py-1 text-[10px] font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800";
+            openLink.textContent = "Open";
+
+            const copyBtn = document.createElement("button");
+            copyBtn.type = "button";
+            copyBtn.className =
+              "inline-flex items-center rounded-lg bg-slate-900 px-2 py-1 text-[10px] font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white";
+            copyBtn.textContent = "Copy link";
+            copyBtn.addEventListener("click", function () {
+              navigator.clipboard.writeText(file.url).then(
+                function () {
+                  copyBtn.textContent = "Copied";
+                  setTimeout(function () {
+                    copyBtn.textContent = "Copy link";
+                  }, 1200);
+                },
+                function () {
+                  alert("Gagal menyalin link.");
+                }
+              );
+            });
+
+            actions.appendChild(openLink);
+            actions.appendChild(copyBtn);
+
+            header.appendChild(title);
+            header.appendChild(actions);
+
+            const preview = document.createElement("div");
+            preview.className = "mt-2";
+
+            if (file.type === "video") {
+              preview.innerHTML =
+                '<video controls class="mx-auto w-full max-w-xs rounded-lg border border-slate-700 bg-black shadow-sm"><source src="' +
+                file.url +
+                '"></video>';
+            } else if (file.type === "image") {
+              preview.innerHTML =
+                '<img src="' +
+                file.url +
+                '" class="mx-auto w-full max-w-xs rounded-lg border border-slate-700 bg-slate-900 object-contain shadow-sm" alt="' +
+                file.filename +
+                '">';
+            } else {
+              const box = document.createElement("div");
+              box.className =
+                "flex h-20 items-center justify-center rounded-lg border border-dashed border-slate-400 text-[11px] text-slate-500 dark:border-slate-600 dark:text-slate-400";
+              box.textContent = "Tidak ada preview. Gunakan tombol Open untuk melihat file.";
+              preview.appendChild(box);
+            }
+
+            const urlEl = document.createElement("p");
+            urlEl.className =
+              "mt-2 truncate font-mono text-[10px] text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100";
+            urlEl.textContent = file.url;
+
+            wrapper.appendChild(header);
+            wrapper.appendChild(preview);
+            wrapper.appendChild(urlEl);
+            fileListEl.appendChild(wrapper);
+          });
+      }
+
+      newFolderForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const name = newFolderInput.value.trim();
+        if (!name) {
+          return;
+        }
+        const id = "fld_" + Date.now().toString(36);
+        folders.push({ id: id, name: name });
+        newFolderInput.value = "";
+        setActiveFolder(id);
+        saveState();
+      });
+
+      uploadForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        uploadStatus.textContent = "";
+
+        if (!fileInput.files || !fileInput.files[0]) {
+          uploadStatus.textContent = "Pilih file terlebih dahulu.";
+          uploadStatus.className = "text-[11px] text-red-500";
+          return;
+        }
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const folderNameRaw = folderInput.value.trim();
+        const activeFolder = folders.find((f) => f.id === activeFolderId);
+        if (activeFolder && activeFolder.name && !folderNameRaw) {
+          formData.append("folder", activeFolder.name);
+        } else if (folderNameRaw) {
+          formData.append("folder", folderNameRaw);
+        }
+
+        uploadButton.disabled = true;
+        uploadSpinner.classList.remove("hidden");
+        uploadText.textContent = "Uploading...";
+        uploadButton.classList.add("opacity-80", "cursor-wait");
+
+        try {
+          const res = await fetch("/upload", {
+            method: "POST",
+            body: formData
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            const message = data && data.message ? data.message : "Upload gagal.";
+            uploadStatus.textContent = message;
+            uploadStatus.className = "text-[11px] text-red-500";
+          } else {
+            uploadStatus.textContent = "Upload berhasil.";
+            uploadStatus.className = "text-[11px] text-emerald-500";
+
+            const folderIdToUse = activeFolderId || (folders[0] && folders[0].id) || "default";
+            const newFile = {
+              id: "file_" + Date.now().toString(36),
+              folderId: folderIdToUse,
+              url: data.url,
+              filename: data.filename || file.name,
+              size: data.size || file.size,
+              type: fileTypeFromName(data.filename || file.name),
+              createdAt: Date.now()
+            };
+            files.push(newFile);
+            saveState();
+            renderFiles();
+          }
+        } catch (err) {
+          uploadStatus.textContent = "Error: " + err.message;
+          uploadStatus.className = "text-[11px] text-red-500";
+        } finally {
+          uploadButton.disabled = false;
+          uploadSpinner.classList.add("hidden");
+          uploadText.textContent = "Upload";
+          uploadButton.classList.remove("opacity-80", "cursor-wait");
+        }
+      });
+
+      initTheme();
+      loadState();
+      renderFolders();
+      renderFiles();
+    </script>
+  </body>
+</html>
